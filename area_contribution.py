@@ -3,12 +3,12 @@ import pandas as pd
 import io
 
 # 1. レイアウト設定
-st.set_page_config(page_title="テストデータ", layout="wide")
+st.set_page_config(page_title="地域貢献", layout="wide")
 
-st.title("テスト.xlsx")
+st.title("area_contribution.xlsx")
 
 # 2．Excelファイルの読み込み
-df = pd.read_excel("テスト.xlsx")
+df = pd.read_excel("area_contribution.xlsx")
 
 # 3. フィルタセクション
 st.write("### 絞り込み検索")
