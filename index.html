@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+    <title>地域貢献ダッシュボード</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@stlite/mountable@0.60.0/build/stlite.css" />
+  </head>
+  <body>
+    <div id="root"></div>
+    <script src="https://cdn.jsdelivr.net/npm/@stlite/mountable@0.60.0/build/stlite.js"></script>
+    <script>
+      stlite.mount({
+        requirements: ["pandas", "openpyxl", "streamlit"], // 必要なライブラリ
+        entrypoint: "entry.py",
+        files: {
+          "entry.py": `
+import streamlit as st
+import pandas as pd
+import io
+
+# 1. レイアウト設定
+st.set_page_config(page_title="地域貢献", layout="wide")
+
+st.title("area_contribution.xlsx")
+
+# 2．Excelファイルの読み込み（GitHub上のファイルを読み込む設定）
+@st.cache_data
+def load_data():
+    # 同階層にあるExcelを読み込む
+    return pd.read_excel("area_contribution.xlsx")
+
+df = load_data()
+
+# --- 以下、元のコードをそのまま貼り付け ---
+import streamlit as st
+import pandas as pd  
+import io
+
+# 1. レイアウト設定
+st.set_page_config(page_title="地域貢献", layout="wide")
+
+st.title("area_contribution.xlsx")
+
+# 2．Excelファイルの読み込み
+df = pd.read_excel("area_contribution.xlsx")
+
+# 3. フィルタセクション
+st.write("### 絞り込み検索")
+col1, col2, col3 = st.columns(3)
+
+with col1:
+    selected_years = st.multiselect(
+        "年度を選択",
+        options=sorted(df["年度"].unique().tolist(), reverse=True),
+        default=[]
+    )
+
+with col2:
+    selected_offices = st.multiselect(
+        "事業所を選択",
+        options=sorted(df["事業所"].unique().tolist()),
+        default=[]
+    )
+
+
+with col3:
+    selected_depts = st.multiselect(
+        "診療科を選択",
+        options=sorted(
+            df["診療科"]
+            .dropna()
+            .astype(str)
+            .unique()
+            .tolist()
+        ),
+        default=[]
+    )
+
+
+# 4. フィルタリングロジック
+filtered_df = df.copy()
+
+if selected_years:
+    filtered_df = filtered_df[filtered_df["年度"].isin(selected_years)]
+if selected_offices:
+    filtered_df = filtered_df[filtered_df["事業所"].isin(selected_offices)]
+if selected_depts:
+    filtered_df = filtered_df[filtered_df["診療科"].isin(selected_depts)]
+
+# 5. CSVダウンロード機能
+# 日本語文字化け防止のためutf-8-sig
+csv_data = filtered_df.to_csv(index=False).encode('utf-8-sig')
+
+st.download_button(
+    label="📥 表示中のデータをCSVで保存",
+    data=csv_data,
+    file_name='extracted_data.csv',
+    mime='text/csv',
+)
+
+# 6. テーブル表示（PC/SP共に横スクロール対応）
+st.write(f"表示件数: {len(filtered_df)} 件")
+
+st.dataframe(
+    filtered_df,
+    use_container_width=True, 
+    hide_index=True
+)
+
+# 見栄えの調整
+st.markdown("""
+    <style>
+    div[data-testid="stDataFrame"] {
+        font-size: 0.85rem;
+    }
+    </style>
+    """, unsafe_allow_html=True)
+`,
+          "area_contribution.xlsx": {
+            url: "./area_contribution.xlsx", // 同じリポジトリにあるExcelを参照
+          },
+        },
+      }, document.getElementById("root"));
+    </script>
+  </body>
+</html>
