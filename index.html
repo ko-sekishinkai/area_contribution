@@ -22,15 +22,25 @@ import pandas as pd
 # --- 設定は必ず一番最初に行う ---
 st.set_page_config(page_title="地域貢献", layout="wide")
 
-# --- 次にデータの読み込み ---
+# --- 【修正ポイント1】読み込み処理の変更 ---
 @st.cache_data
 def load_data():
-    return pd.read_excel("area_contribution.xlsx")
+    # パスを変数に格納
+    EXCEL_FILE = "area_contribution.xlsx"
+    # pd.read_excel を使わず、動く方のアプリと同じ pd.ExcelFile + engine指定 を使用する
+    xl = pd.ExcelFile(EXCEL_FILE, engine="openpyxl")
+    # 最初のシート(index 0)を読み込む
+    return xl.parse(xl.sheet_names[0])
 
-df = load_data()
+# データのロードを実行
+try:
+    df = load_data()
+except Exception as e:
+    st.error(f"データの読み込みに失敗しました: {e}")
+    st.stop()
 
 # --- その後に画面表示の命令 ---
-st.title("area_contribution.xlsx")
+st.title("地域貢献ダッシュボード") # タイトルを綺麗に修正
 
 st.write("### 絞り込み検索")
 col1, col2, col3 = st.columns(3)
