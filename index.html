@@ -87,7 +87,17 @@ st.download_button(
 )
 
 st.write(f"表示件数: {len(filtered_df)} 件")
-st.dataframe(filtered_df, use_container_width=True, hide_index=True)
+st.dataframe(
+    filtered_df, 
+    use_container_width=True, 
+    hide_index=True,
+    column_config={
+        "年度": st.column_config.NumberColumn(
+            "年度",
+            format="%d"  # カンマなしの整数として表示
+        )
+    }
+)
 
 st.markdown("""
     <style>
