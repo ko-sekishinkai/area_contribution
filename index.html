@@ -35,6 +35,10 @@ def load_data():
     xl = pd.ExcelFile(EXCEL_FILE, engine="openpyxl")
     # 最初のシート(index 0)を読み込む
     return xl.parse(xl.sheet_names[0])
+    # 「年度」列が存在する場合、中身を文字列（str）に変換する
+    if "年度" in df.columns:
+        df["年度"] = df["年度"].astype(str).str.replace(".0", "", regex=False)
+    # ------------------
 
 # データのロードを実行
 try:
