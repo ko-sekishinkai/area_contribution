@@ -59,14 +59,14 @@ with col1:
 with col2:
     selected_offices = st.multiselect(
         "事業所を選択",
-        options=sorted(df["事業所"].unique().tolist()),
+        options=sorted(map(str, df["事業所"].unique().tolist())),
         default=[]
     )
 
 with col3:
     selected_depts = st.multiselect(
         "診療科を選択",
-        options=sorted(df["診療科"].dropna().astype(str).unique().tolist()),
+        options=sorted(map(str, df["診療科"].dropna().astype(str).unique().tolist())),
         default=[]
     )
 

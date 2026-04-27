@@ -24,7 +24,7 @@ with col1:
 with col2:
     selected_offices = st.multiselect(
         "事業所を選択",
-        options=sorted(df["事業所"].unique().tolist()),
+        options=sorted(map(str, df["事業所"].unique().tolist())),
         default=[]
     )
 
