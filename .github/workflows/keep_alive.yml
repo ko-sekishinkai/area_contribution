@@ -1,0 +1,19 @@
+name: Streamlit Keep Alive
+
+# 実行タイミングの設定
+on:
+  schedule:
+    # cron（分 時 日 月 曜日）形式
+    # 以下の設定は「毎日、毎時0分」に実行されます
+    - cron: '0 */12 * * *'
+  # 手動でテスト実行できるようにする設定
+  workflow_dispatch:
+
+jobs:
+  ping_job:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Send HTTP Request
+        # -I はヘッダーのみ取得（負荷軽減）、-s はログをスッキリさせるオプション
+        run: |
+          curl -I -s https://areacontribution-xygglsrpjvg7qkv4dmbpic.streamlit.app/
