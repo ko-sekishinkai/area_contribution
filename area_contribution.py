@@ -1,23 +1,42 @@
 import streamlit as st
-import pandas as pd  
-import io
+import pandas as pd
 
-# 1. レイアウト設定
+# --- 設定は必ず一番最初に行う ---
 st.set_page_config(page_title="地域貢献", layout="wide")
 
-st.title("area_contribution.xlsx")
+# --- 【修正ポイント1】読み込み処理の変更 ---
+@st.cache_data
+def load_data():
+    # パスを変数に格納
+    EXCEL_FILE = "area_contribution.xlsx"
+    # pd.read_excel を使わず、動く方のアプリと同じ pd.ExcelFile + engine指定 を使用する
+    xl = pd.ExcelFile(EXCEL_FILE, engine="openpyxl")
+    # 最初のシート(index 0)を読み込む
+    df = xl.parse(xl.sheet_names[0])
+    # 「年度」列が存在する場合、中身を文字列（str）に変換する
+    if "年度" in df.columns:
+        df["年度"] = df["年度"].astype(str).str.replace(".0", "", regex=False)
+    # ------------------
+    return df
 
-# 2．Excelファイルの読み込み
-df = pd.read_excel("area_contribution.xlsx")
 
-# 3. フィルタセクション
+# データのロードを実行
+try:
+    df = load_data()
+except Exception as e:
+    st.error(f"データの読み込みに失敗しました: {e}")
+    st.stop()
+
+# --- その後に画面表示の命令 ---
+st.title("地域貢献") # タイトルを綺麗に修正
+
 st.write("### 絞り込み検索")
 col1, col2, col3 = st.columns(3)
 
 with col1:
     selected_years = st.multiselect(
         "年度を選択",
-        options=sorted(df["年度"].unique().tolist(), reverse=True),
+        options=sorted(map(str, df["年度"].unique().tolist()), reverse=True),
         default=[]
     )
 
@@ -28,24 +47,14 @@ with col2:
         default=[]
     )
 
-
 with col3:
     selected_depts = st.multiselect(
         "診療科を選択",
-        options=sorted(
-            df["診療科"]
-            .dropna()
-            .astype(str)
-            .unique()
-            .tolist()
-        ),
+        options=sorted(map(str, df["診療科"].dropna().astype(str).unique().tolist())),
         default=[]
     )
 
-
-# 4. フィルタリングロジック
 filtered_df = df.copy()
-
 if selected_years:
     filtered_df = filtered_df[filtered_df["年度"].isin(selected_years)]
 if selected_offices:
@@ -53,10 +62,7 @@ if selected_offices:
 if selected_depts:
     filtered_df = filtered_df[filtered_df["診療科"].isin(selected_depts)]
 
-# 5. CSVダウンロード機能
-# 日本語文字化け防止のためutf-8-sig
 csv_data = filtered_df.to_csv(index=False).encode('utf-8-sig')
-
 st.download_button(
     label="📥 表示中のデータをCSVで保存",
     data=csv_data,
@@ -64,20 +70,21 @@ st.download_button(
     mime='text/csv',
 )
 
-# 6. テーブル表示（PC/SP共に横スクロール対応）
 st.write(f"表示件数: {len(filtered_df)} 件")
-
 st.dataframe(
-    filtered_df,
+    filtered_df, 
     use_container_width=True, 
-    hide_index=True
+    hide_index=True,
+    column_config={
+        "年度": st.column_config.NumberColumn(
+            "年度",
+            format="%d"  # カンマなしの整数として表示
+        )
+    }
 )
 
-# 見栄えの調整
 st.markdown("""
     <style>
-    div[data-testid="stDataFrame"] {
-        font-size: 0.85rem;
-    }
+    div[data-testid="stDataFrame"] { font-size: 0.85rem; }
     </style>
     """, unsafe_allow_html=True)
