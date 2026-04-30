@@ -19,7 +19,7 @@ jobs:
 
       - name: Send HTTP Request (Ping)
         run: |
-          curl -I -s https://areacontribution-xygglsrpjvg7qkv4dmbpic.streamlit.app/
+          curl -LIsf https://areacontribution-xygglsrpjvg7qkv4dmbpic.streamlit.app/
 
       - name: Auto Update (Keep Active)
         # 月曜日の午前3時の実行時のみ、ファイルを微修正してCommitする
