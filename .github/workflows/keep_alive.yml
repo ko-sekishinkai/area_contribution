@@ -1,19 +1,33 @@
-name: Streamlit Keep Alive
+name: Streamlit Ultra Keep Alive
 
-# 実行タイミングの設定
 on:
   schedule:
-    # cron（分 時 日 月 曜日）形式
-    # 以下の設定は「毎日、毎時0分」に実行されます
-    - cron: '0 */12 * * *'
-  # 手動でテスト実行できるようにする設定
-  workflow_dispatch:
+    # 【案A】1時間に1回アクセス（スリープ判定を回避）
+    - cron: '0 * * * *'
+    # 【案B】週に1回、深夜に「擬似的な更新」を発生させる
+    - cron: '0 3 * * 1'
+  workflow_dispatch: # 手動実行用
 
 jobs:
-  ping_job:
+  ping_and_refresh:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write # 更新を書き込むために必要
     steps:
-      - name: Send HTTP Request
-        # -I はヘッダーのみ取得（負荷軽減）、-s はログをスッキリさせるオプション
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Send HTTP Request (Ping)
         run: |
           curl -I -s https://areacontribution-xygglsrpjvg7qkv4dmbpic.streamlit.app/
+
+      - name: Auto Update (Keep Active)
+        # 月曜日の午前3時の実行時のみ、ファイルを微修正してCommitする
+        if: github.event.schedule == '0 3 * * 1'
+        run: |
+          date > last_keep_alive.txt
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add last_keep_alive.txt
+          git commit -m "Keep-alive: Periodic activity update"
+          git push
