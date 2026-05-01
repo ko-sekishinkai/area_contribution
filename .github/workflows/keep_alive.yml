@@ -19,7 +19,8 @@ jobs:
 
       - name: Send HTTP Request (Ping)
         run: |
-          curl -Ls https://areacontribution-xygglsrpjvg7qkv4dmbpic.streamlit.app/
+          curl -L -s -H "User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36" \
+          https://areacontribution-xygglsrpjvg7qkv4dmbpic.streamlit.app/ > /dev/null
 
       - name: Auto Update (Keep Active)
         # 月曜日の午前3時の実行時のみ、ファイルを微修正してCommitする
