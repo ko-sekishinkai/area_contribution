@@ -18,11 +18,13 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Send HTTP Request (Ping)
-        # 最後に "|| true" を足すことで、curlがどんなエラーを出しても
-        # GitHub Actionsを中断させずに無理やり「成功」として次に進ませます。
         run: |
-          curl -L -s -H "User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36" \
-          https://areacontribution-xygglsrpjvg7qkv4dmbpic.streamlit.app/ > /dev/null || true
+          # 1. 詳しい通信ログを表示 (-v)
+          # 2. 最後にHTTPステータスコードだけを大きく表示 (-w)
+          # 3. ブラウザのふりをする (-H)
+          curl -v -L -H "User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36" \
+          "https://area-contribution.streamlit.app/" \
+          -o /dev/null -w "\n--- RESULT ---\nHTTP Status: %{http_code}\nURL: %{url_effective}\n--------------\n" || true
 
       - name: Auto Update (Keep Active)
         # 月曜日の午前3時の実行時のみ、ファイルを微修正してCommitする
