@@ -9,7 +9,7 @@ st.set_page_config(page_title="人事情報", layout="wide")
 @st.cache_data
 def load_data():
     # パスを変数に格納
-    EXCEL_FILE = "hr_information.xlsx"
+    EXCEL_FILE = "area_contribution.xlsx"
     # pd.read_excel を使わず、動く方のアプリと同じ pd.ExcelFile + engine指定 を使用する
     xl = pd.ExcelFile(EXCEL_FILE, engine="openpyxl")
     # 最初のシート(index 0)を読み込む
