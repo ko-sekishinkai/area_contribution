@@ -1,9 +1,8 @@
 import streamlit as st
 import pandas as pd
 
-
 # --- 設定は必ず一番最初に行う ---
-st.set_page_config(page_title="人事情報", layout="wide")
+st.set_page_config(page_title="地域貢献", layout="wide")
 
 # --- 【修正ポイント1】読み込み処理の変更 ---
 @st.cache_data
@@ -29,7 +28,7 @@ except Exception as e:
     st.stop()
 
 # --- その後に画面表示の命令 ---
-st.title("人事情報") # タイトルを綺麗に修正
+st.title("地域貢献") # タイトルを綺麗に修正
 
 st.write("### 絞り込み検索")
 col1, col2, col3 = st.columns(3)
@@ -50,8 +49,8 @@ with col2:
 
 with col3:
     selected_depts = st.multiselect(
-        "辞令を選択",
-        options=sorted(map(str, df["辞令"].dropna().astype(str).unique().tolist())),
+        "診療科を選択",
+        options=sorted(map(str, df["診療科"].dropna().astype(str).unique().tolist())),
         default=[]
     )
 
@@ -61,7 +60,7 @@ if selected_years:
 if selected_offices:
     filtered_df = filtered_df[filtered_df["事業所"].isin(selected_offices)]
 if selected_depts:
-    filtered_df = filtered_df[filtered_df["辞令"].isin(selected_depts)]
+    filtered_df = filtered_df[filtered_df["診療科"].isin(selected_depts)]
 
 csv_data = filtered_df.to_csv(index=False).encode('utf-8-sig')
 st.download_button(
